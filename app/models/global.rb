@@ -3,6 +3,8 @@ class Global
   NOTHING_ARRAY = YAML::dump([])
   LIMIT = 80
 
+  attr_accessor :currency
+
   def initialize(currency)
     @currency = currency
   end
@@ -22,8 +24,6 @@ class Global
   def channel
     "market-#{@currency}-global"
   end
-
-  attr_accessor :currency
 
   def self.[](market)
     if market.is_a? Market
@@ -48,10 +48,20 @@ class Global
   def trades
     redis_client.read(key('trades')) || update_trades
   end
-  
+
   def since_trades(id)
-    trades ||= Trade.with_currency(currency).where("id > ?", id).order(:id).limit(LIMIT)
-    trades.map do |t| format_trade(t) end
+    trades ||= Trade.with_currency(currency)
+      .where("id > ?", id).order(:id).limit(LIMIT)
+    trades.map {|t| format_trade(t)}
+  end
+
+  def trades_by_hours(num)
+    trades ||= Trade.with_currency(currency)
+      .select("id, price, sum(volume) as volume, trend, currency, max(created_at) as created_at")
+      .where("created_at > ?", num.to_i.hours.ago).order(:id)
+      .group("ROUND(UNIX_TIMESTAMP(created_at)/(15 * 60))") # per 15 minutes
+      .order('max(created_at) ASC')
+    trades.map {|t| format_trade(t)}
   end
 
   def asks
@@ -67,10 +77,10 @@ class Global
       redis_client.write key('ticker'), {
         :at => at,
         :low => query.h24.minimum(:price) || ZERO,
-        :high => query.h24.maximum(:price) || ZERO, 
-        :last => query.last.try(:price) || ZERO, 
-        :volume => query.h24.sum(:volume) || ZERO, 
-        :buy => (bids.first && bids.first[0]) || ZERO, 
+        :high => query.h24.maximum(:price) || ZERO,
+        :last => query.last.try(:price) || ZERO,
+        :volume => query.h24.sum(:volume) || ZERO,
+        :buy => (bids.first && bids.first[0]) || ZERO,
         :sell => (asks.first && asks.first[0]) || ZERO
       }
     end
@@ -88,7 +98,7 @@ class Global
   end
 
   def format_trade(t)
-    { :date => t.created_at.to_i, 
+    { :date => t.created_at.to_i,
       :price => t.price.to_s || ZERO,
       :amount => t.volume.to_s || ZERO,
       :tid => t.id,
@@ -97,7 +107,7 @@ class Global
 
   def update_trades
     @trades ||= Trade.with_currency(currency).last(LIMIT).reverse
-    @maped_trades = @trades.map do |t| format_trade(t) end
+    @maped_trades = @trades.map {|t| format_trade(t)}
     redis_client.write key('trades'), (@maped_trades || [])
     trades
   end
