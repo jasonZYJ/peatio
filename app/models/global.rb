@@ -55,13 +55,15 @@ class Global
     trades.map {|t| format_trade(t)}
   end
 
-  def trades_by_hours(num)
-    trades ||= Trade.with_currency(currency)
-      .select("id, price, sum(volume) as volume, trend, currency, max(created_at) as created_at")
-      .where("created_at > ?", num.to_i.hours.ago).order(:id)
-      .group("ROUND(UNIX_TIMESTAMP(created_at)/(15 * 60))") # per 15 minutes
-      .order('max(created_at) ASC')
-    trades.map {|t| format_trade(t)}
+  def market_data
+    Rails.cache.fetch "market data #{Time.now.strftime('%F %R')}" do
+      trades ||= Trade.with_currency(currency)
+        .select("id, price, sum(volume) as volume, trend, currency, max(created_at) as created_at")
+        .where("created_at > ?", 12.to_i.hours.ago).order(:id)
+        .group("ROUND(UNIX_TIMESTAMP(created_at)/(15 * 60))") # per 15 minutes
+        .order('max(created_at) ASC')
+      trades.map {|t| format_trade(t)}
+    end
   end
 
   def asks

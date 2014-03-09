@@ -19,6 +19,10 @@ class ApplicationController < ActionController::Base
       :done => I18n.t('actions.clipboard.done')
     }
 
+    gon.market_data = Global[latest_market].market_data
+    gon.market_data_volume_name = t('activerecord.attributes.trade.price')
+    gon.market_data_price_name = t('activerecord.attributes.trade.volume')
+
     if current_user
       gon.current_user = {:sn => current_user.sn}
     end
