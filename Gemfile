@@ -48,6 +48,7 @@ gem 'active_hash'
 gem 'pusher'
 gem 'http_accept_language'
 gem "globalize", "~> 4.0.0"
+gem 'redis-rails'
 
 group :development, :test do
   gem 'factory_girl_rails'
@@ -74,4 +75,6 @@ group :test do
   gem 'poltergeist'
 end
 
-gem 'unicorn'
+group :production do
+  gem 'unicorn'
+end
