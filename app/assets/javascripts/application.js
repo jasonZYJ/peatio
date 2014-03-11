@@ -39,6 +39,7 @@
 //= require pusher.min
 //= require i18n
 //= require i18n/translations
+//= require timeago
 //= require d3.v3
 //= require nv.d3
 
