@@ -43,8 +43,9 @@
 //= require d3.v3
 //= require nv.d3
 
+//= require_tree ./templates
+//= require template_helper
+//
 //= require_tree ./component_data
 //= require_tree ./component_ui
-//= require_tree ./templates
-//= require chart
 //= require app
