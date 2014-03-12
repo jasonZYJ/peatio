@@ -25,6 +25,6 @@ class Trade < ActiveRecord::Base
 
   def link_member
     self.bid && self.bid.member.trades << self
-    self.bid && self.ask.member.trades << self
+    self.ask && self.ask.member.trades << self
   end
 end

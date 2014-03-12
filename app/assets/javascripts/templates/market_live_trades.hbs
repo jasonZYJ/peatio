@@ -1,0 +1,15 @@
+<thead>
+  <tr>
+    <th>Time</th>
+    <th>Ask User</th>
+    <th>Bid User</th>
+    <th>Volumn</th>
+    <th>Price</th>
+    <th>Total</th>
+  </tr>
+</thead>
+<tbody>
+  {{#each trades}}
+    {{> partial_market_live_trade}}
+  {{/each}}
+</tbody>

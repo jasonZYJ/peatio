@@ -1,6 +1,6 @@
 window.GlobalData = flight.component ->
   @.after 'initialize', ->
-    @.attr.channel = @.attr.pusher.subscribe("market-#{gon.market.id}-global");
+    @.attr.channel = @.attr.pusher.subscribe("market-#{gon.market.id}-global")
 
     @.attr.channel.bind 'update', (data) =>
       gon.asks = data.asks

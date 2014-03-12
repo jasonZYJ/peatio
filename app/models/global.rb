@@ -100,15 +100,25 @@ class Global
   end
 
   def format_trade(t)
-    { :date => t.created_at.to_i,
-      :price => t.price.to_s || ZERO,
-      :amount => t.volume.to_s || ZERO,
-      :tid => t.id,
-      :type => t.trend ? 'sell' : 'buy' }
+    ask_member_sn = Rails.cache.fetch "#{t.cache_key}_ask_member_sn" do
+      t.ask.member.sn
+    end
+
+    bid_member_sn = Rails.cache.fetch "#{t.cache_key}_bid_member_sn" do
+      t.bid.member.sn
+    end
+
+    { ask_member_sn: ask_member_sn,
+      bid_member_sn: bid_member_sn,
+      date:   t.created_at.to_i,
+      price:  t.price.to_s  || ZERO,
+      amount: t.volume.to_s || ZERO,
+      tid:    t.id,
+      type:   t.trend ? 'sell' : 'buy' }
   end
 
   def update_trades
-    @trades ||= Trade.with_currency(currency).last(LIMIT).reverse
+    @trades ||= Trade.with_currency(currency).order(:id).reverse_order.last(LIMIT)
     @maped_trades = @trades.map {|t| format_trade(t)}
     redis_client.write key('trades'), (@maped_trades || [])
     trades

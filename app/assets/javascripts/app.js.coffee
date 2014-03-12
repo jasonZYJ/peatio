@@ -64,6 +64,7 @@ $ ->
   MarketTickerUI.attachTo('.ticker')
   MarketOrdersUI.attachTo('.orders')
   MarketTradesUI.attachTo('.trades')
+  MarketLiveTradesUI.attachTo('.live-trades')
 
   TradeAccountUI.attachTo('.account-wrapper')
 
