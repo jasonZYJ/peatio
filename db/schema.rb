@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140306021833) do
+ActiveRecord::Schema.define(version: 20140312090700) do
 
   create_table "account_versions", force: true do |t|
     t.integer  "member_id"
@@ -156,6 +156,8 @@ ActiveRecord::Schema.define(version: 20140306021833) do
     t.datetime "updated_at"
     t.string   "sn"
   end
+
+  add_index "orders", ["type", "id"], name: "index_orders_on_type_and_id", using: :btree
 
   create_table "payment_addresses", force: true do |t|
     t.integer  "account_id"
