@@ -6,11 +6,11 @@ organizeData = (json) ->
     amountData.push {x: i.date * 1000, y: i.price}
 
   data = [
-    "key": gon.market_data_price_name
+    "key": I18n.t('activerecord.attributes.trade.price')
     "bar": true
     "values": priceData
   ,
-    "key": gon.market_data_volume_name
+    "key": I18n.t('activerecord.attributes.trade.volume')
     "values": amountData
   ]
 
