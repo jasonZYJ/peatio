@@ -63,7 +63,7 @@ describe Account do
   describe "double operation" do
     let(:strike_volume) { "10.0".to_d }
     let(:account) { create(:account) }
-    
+
     it "expect double operation funds" do
       expect do
         account.plus_funds(strike_volume, reason: Account::STRIKE_ADD)
@@ -81,7 +81,7 @@ describe Account do
 
   describe "#versions" do
     let(:account) { create(:account) }
-    
+
     context 'when account add funds' do
       subject { account.plus_funds("10".to_d, reason: Account::WITHDRAW).last_version }
 
@@ -188,6 +188,26 @@ describe Account do
     it "should be examine error whit hack account version" do
       account.versions.load.sample.update_attribute(:amount, 50.to_d)
       expect(account.examine).to be_false
+    end
+  end
+
+  describe "gen_payment_address" do
+    let(:account) { create(:account_btc) }
+    let(:address) { Faker::Bitcoin.address }
+    let(:wallet) { Currency.coin_wallets[account.currency] }
+
+    it 'gets it from HD wallet' do
+      wallet.expects(:next_address).returns(address)
+      expect(account.gen_payment_address.address).to eq(address)
+    end
+
+    it 'stores the address with index and currency' do
+      payment_address = nil
+      expect {
+        payment_address = account.gen_payment_address
+      }.to change { PaymentAddress.max_address_index(account.currency) }.by(1)
+
+      expect(payment_address.address_index).to eq(wallet.last_index)
     end
   end
 end
