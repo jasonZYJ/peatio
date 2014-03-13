@@ -8,14 +8,6 @@ class Currency < Settingslogic
     @coins ||= extract_coin_property :rpc
   end
 
-  def self.coin_wallets
-    @wallets ||= extract_coin_property(:hdwallet) do |currency, hex|
-      wallet = HDWallet.wallet_where(serialized_address: hex, currency: currencies[currency])
-      wallet.keychain = HDKeychain.new hex
-      wallet
-    end
-  end
-
   def self.codes
     # {:currency => :currency_code, ...}
     @codes ||= self.currencies.symbolize_keys
@@ -31,6 +23,13 @@ class Currency < Settingslogic
     @trade_configs[code.to_sym].symbolize_keys.tap do |conf|
       conf[:bid][:fee] = conf[:bid][:fee].to_d / 10000.to_d
       conf[:ask][:fee] = conf[:ask][:fee].to_d / 10000.to_d
+    end
+  end
+
+  def self.find_or_create_wallets_from_config
+    extract_coin_property(:hdwallet) do |currency, hex|
+      query = { serialized_address: hex, currency: currencies[currency] }
+      HDWallet.where(query).first_or_create
     end
   end
 
