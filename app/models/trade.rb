@@ -9,6 +9,9 @@ class Trade < ActiveRecord::Base
   belongs_to :ask, class_name: 'OrderAsk', foreign_key: 'ask_id'
   belongs_to :bid, class_name: 'OrderBid', foreign_key: 'bid_id'
 
+  delegate :ask_member_sn, to: :ask, allow_nil: true
+  delegate :bid_member_sn, to: :bid, allow_nil: true
+
   scope :h24, -> { where("created_at > ?", 24.hours.ago) }
 
   def sn

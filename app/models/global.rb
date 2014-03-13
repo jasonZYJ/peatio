@@ -101,11 +101,11 @@ class Global
 
   def format_trade(t)
     ask_member_sn = Rails.cache.fetch "#{t.cache_key}_ask_member_sn" do
-      t.ask.member.sn
+      t.ask_member_sn
     end
 
     bid_member_sn = Rails.cache.fetch "#{t.cache_key}_bid_member_sn" do
-      t.bid.member.sn
+      t.bid_member_sn
     end
 
     { ask_member_sn: ask_member_sn,

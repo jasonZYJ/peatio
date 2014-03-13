@@ -21,6 +21,10 @@ class OrderBid < Order
     :sum
   end
 
+  def bid_member_sn
+    member.sn
+  end
+
   has_many :trades, foreign_key: 'bid_id'
 
   scope :matching_rule, -> { order('price DESC, created_at ASC') }

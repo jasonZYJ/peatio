@@ -19,6 +19,10 @@ class OrderAsk < Order
     :origin_volume
   end
 
+  def ask_member_sn
+    member.sn
+  end
+
   has_many :trades, foreign_key: 'ask_id'
 
   scope :matching_rule, -> { order('price ASC, created_at ASC') }
