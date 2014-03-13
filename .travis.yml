@@ -12,8 +12,7 @@ before_script:
   - "cp ./.travis.currency.yml ./config/currency.yml"
   - "mkdir -p ./tmp/cache"
 script:
-  - bundle exec rake db:schema:load
-  - bundle exec rake db:test:prepare
+  - bundle exec rake db:reset db:test:prepare
   - bundle exec rake spec
 after_failure:
   - "mysql -e 'show databases;'"
