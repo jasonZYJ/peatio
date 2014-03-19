@@ -27,7 +27,7 @@ class Account < ActiveRecord::Base
   has_many :withdraw_addresses
   has_many :versions, class_name: "::AccountVersion"
 
-  def gen_payment_address
+  def generate_payment_address
     Account.transaction do
       address = HDWallet.next_address(self.currency_value)
       self.payment_addresses << address
@@ -35,13 +35,22 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def next_payment_address
+    address = payment_address
+    unless address.used?
+      return address
+    end
+
+    generate_payment_address
+  end
+
   def payment_address
     last_address = payment_addresses.last
-    if last_address && last_address.transactions.blank?
+    if last_address
       return last_address
     end
 
-    gen_payment_address
+    generate_payment_address
   end
 
   def self.after(*names)
